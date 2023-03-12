@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -9,32 +10,38 @@ import (
 func main() {
 	// Create a new root command
 	rootCmd := &cobra.Command{
-		Use:   "hello",
-		Short: "A simple CLI for greeting and saying goodbye",
+		Use:   "utils",
+		Short: "A collection of utils CLI commands",
 	}
 
 	// Create a new subcommand for greeting
-	greetCmd := &cobra.Command{
-		Use:   "greet",
-		Short: "Greet someone",
+	toEpochCommand := &cobra.Command{
+		Use:   "to_epoch",
+		Short: "Convert to epoch time",
 		Run: func(cmd *cobra.Command, args []string) {
-			name, _ := cmd.Flags().GetString("name")
-			verbose, _ := cmd.Flags().GetBool("verbose")
-
-			if verbose {
-				fmt.Printf("Hello, %s!\n", name)
+			timestampStr, _ := cmd.Flags().GetString("timestamp")
+			seconds, _ := cmd.Flags().GetBool("short")
+			t := time.Now()
+			if len(timestampStr) != 0 {
+				layout := "2006-01-02T15:04:05Z"
+				timestamp, err := time.Parse(layout, timestampStr)
+				if err != nil {
+					panic(fmt.Errorf("In correct timestamp str: %s", timestampStr))
+				}
+				t = timestamp
+			}
+			if seconds {
+				fmt.Println(t.UnixMilli() / 1000)
 			} else {
-				fmt.Println("Hello!")
+				fmt.Println(t.UnixMilli())
 			}
 		},
 	}
 
-	// Add flags to the greet command
-	greetCmd.Flags().StringP("name", "n", "World", "A name to greet")
-	greetCmd.Flags().BoolP("verbose", "v", false, "Whether to print verbose output")
-
+	toEpochCommand.Flags().StringP("timestamp", "t", "", "Timestamp str in ISO 8601 format. Example ")
+	toEpochCommand.Flags().BoolP("short", "s", false, "Whether to print epoch time in second")
 	// Add the greet command to the root command
-	rootCmd.AddCommand(greetCmd)
+	rootCmd.AddCommand(toEpochCommand)
 
 	// Create a new subcommand for saying goodbye
 	goodbyeCmd := &cobra.Command{
