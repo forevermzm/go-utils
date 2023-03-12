@@ -38,7 +38,7 @@ func main() {
 		},
 	}
 
-	toEpochCommand.Flags().StringP("timestamp", "t", "", "Timestamp str in ISO 8601 format. Example ")
+	toEpochCommand.Flags().StringP("timestamp", "t", "", "Timestamp str in ISO 8601 format. Example 2006-01-02T15:04:05Z")
 	toEpochCommand.Flags().BoolP("short", "s", false, "Whether to print epoch time in second")
 	// Add the greet command to the root command
 	rootCmd.AddCommand(toEpochCommand)
