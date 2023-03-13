@@ -2,10 +2,13 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/spf13/cobra"
 )
+
+const layoutStr = "2006-01-02T15:04:05Z"
 
 func GetToEpochCommand() *cobra.Command {
 	command := &cobra.Command{
@@ -16,8 +19,7 @@ func GetToEpochCommand() *cobra.Command {
 			seconds, _ := cmd.Flags().GetBool("short")
 			t := time.Now()
 			if len(timestampStr) != 0 {
-				layout := "2006-01-02T15:04:05Z"
-				timestamp, err := time.Parse(layout, timestampStr)
+				timestamp, err := time.Parse(layoutStr, timestampStr)
 				if err != nil {
 					panic(fmt.Errorf("In correct timestamp str: %s", timestampStr))
 				}
@@ -32,5 +34,20 @@ func GetToEpochCommand() *cobra.Command {
 	}
 	command.Flags().StringP("timestamp", "t", "", "Timestamp str in ISO 8601 format. Example 2006-01-02T15:04:05Z")
 	command.Flags().BoolP("short", "s", false, "Whether to print epoch time in second")
+	return command
+}
+
+func GetFromEpochCommand() *cobra.Command {
+	command := &cobra.Command{
+		Use:   "from_epoch",
+		Short: "Convert from epoch time",
+		Run: func(cmd *cobra.Command, args []string) {
+			epochTimestamp, _ := cmd.Flags().GetString("timestamp")
+			epochInt, _ := strconv.ParseInt(epochTimestamp, 10, 64)
+			unixTimeUTC := time.Unix(epochInt, 0)
+			fmt.Println(unixTimeUTC.Format(layoutStr))
+		},
+	}
+	command.Flags().StringP("timestamp", "t", "", "Epoch timestamp")
 	return command
 }
