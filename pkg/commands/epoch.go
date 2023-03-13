@@ -21,7 +21,7 @@ func GetToEpochCommand() *cobra.Command {
 			if len(timestampStr) != 0 {
 				timestamp, err := time.Parse(layoutStr, timestampStr)
 				if err != nil {
-					panic(fmt.Errorf("In correct timestamp str: %s", timestampStr))
+					panic(fmt.Errorf("incorrect timestamp str: %s", timestampStr))
 				}
 				t = timestamp
 			}
@@ -42,12 +42,14 @@ func GetFromEpochCommand() *cobra.Command {
 		Use:   "from_epoch",
 		Short: "Convert from epoch time",
 		Run: func(cmd *cobra.Command, args []string) {
-			epochTimestamp, _ := cmd.Flags().GetString("timestamp")
+			if len(args) == 0 {
+				panic("No epoch timestamp is provided!")
+			}
+			epochTimestamp := args[len(args)-1]
 			epochInt, _ := strconv.ParseInt(epochTimestamp, 10, 64)
 			unixTimeUTC := time.Unix(epochInt, 0)
 			fmt.Println(unixTimeUTC.Format(layoutStr))
 		},
 	}
-	command.Flags().StringP("timestamp", "t", "", "Epoch timestamp")
 	return command
 }
